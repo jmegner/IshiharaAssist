@@ -4,6 +4,8 @@ public class IU
 {
     public static final double s_Gamma = 2.2;
     public static final double s_GammaInverse = 1 / s_Gamma;
+    public static final int s_Black = 0x000000;
+    public static final int s_White = 0xffffff;
 
 
     public static int ClampU8(int val) { return Math.max(0, Math.min(255, val)); }
@@ -13,6 +15,15 @@ public class IU
     public static int GetR(int argb) { return (0x00ff0000 & argb) >> 16; }
     public static int GetG(int argb) { return (0x0000ff00 & argb) >> 8; }
     public static int GetB(int argb) { return (0x000000ff & argb); }
+
+
+    public static String RgbToString(int rgb)
+    {
+        return "{" + Integer.toString(GetR(rgb))
+            + "," + Integer.toString(GetG(rgb))
+            + "," + Integer.toString(GetB(rgb))
+            + "}";
+    }
 
 
     public static int GammaCorrectedToLinear(int val)

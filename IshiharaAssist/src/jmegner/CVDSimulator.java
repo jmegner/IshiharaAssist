@@ -66,12 +66,6 @@ public class CVDSimulator
         BufferedImage outImage = new BufferedImage(
             width, height, BufferedImage.TYPE_INT_ARGB);
 
-        //DataBufferInt inBuffer = (DataBufferInt) inImage.getRaster().getDataBuffer();
-        //DataBufferInt outBuffer = (DataBufferInt) outImage.getRaster().getDataBuffer();
-        //int[] inDataX = inBuffer.getData();
-        //int[] outDataX = outBuffer.getData();
-
-        //int[] inData = new int[inImage.getWidth() * inImage.getHeight()];
         int[] outData = new int[width * height];
 
         int[] inData = inImage.getRGB(
@@ -159,34 +153,55 @@ public class CVDSimulator
     }
 
 
-    public int[] getFamilyForBlindYB(int blindY, int blindB)
+    public int[] GetFamilyForBlindYB(int blindY, int blindB)
     {
-        return null;
+        int minG = getMinGForBlindY(blindY);
+        int maxG = getMaxGForBlindY(blindY);
+
+        int[] argbFamily = new int[maxG - minG + 1];
+
+        for(int g = minG; g <= maxG; g++)
+        {
+            int r = getNormalRForBlindYAndNormalG(blindY, g);
+            int b = getNormalBForNormalRGAndBlindB(r, g, blindB);
+
+            argbFamily[g - minG] = IU.GetRgb(r, g, b);
+        }
+
+        return argbFamily;
     }
 
 
     private int getMinGForBlindY(int blindY)
     {
-        return (int) Math.ceil(Math.pow(
-            (Math.pow(blindY, IU.s_Gamma)- m_p1) / m_p2,
-            IU.s_GammaInverse));
+        final double y = blindY / 255.0;
+
+        final double minG = Math.pow(
+            (Math.pow(y, IU.s_Gamma)- m_p1) / m_p2,
+            IU.s_GammaInverse);
+
+        return (int) Math.ceil(255.0 * minG);
     }
 
 
     private int getMaxGForBlindY(int blindY)
     {
-        return (int) Math.floor(Math.pow(m_p2, -IU.s_GammaInverse) * blindY);
+        final double y = blindY / 255.0;
+        final double maxG = Math.pow(m_p2, - IU.s_GammaInverse) * y;
+        return (int) Math.floor(255.0 * maxG);
     }
 
 
-    private int getRForBlindYAndNormalG(int blindY, int normalG)
+    private int getNormalRForBlindYAndNormalG(int blindY, int normalG)
     {
         final double y = blindY / 255.0;
         final double g = normalG / 255.0;
 
-        return IU.ClampU8((int) Math.round(Math.pow(
+        final double r = Math.pow(
             (Math.pow(y, IU.s_Gamma) - m_p2 * Math.pow(g, IU.s_Gamma)) / m_p1,
-            IU.s_GammaInverse)));
+            IU.s_GammaInverse);
+
+        return IU.ClampU8((int) Math.round(255.0 * r));
     }
 
 
