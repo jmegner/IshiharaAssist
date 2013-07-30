@@ -165,7 +165,7 @@ public class CVDSimulator
             int r = getNormalRForBlindYAndNormalG(blindY, g);
             int b = getNormalBForNormalRGAndBlindB(r, g, blindB);
 
-            argbFamily[g - minG] = IU.GetRgb(r, g, b);
+            argbFamily[g - minG] = IU.GetArgb(255, r, g, b);
         }
 
         return argbFamily;
